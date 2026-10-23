@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedInAs(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    match /users/{uid} {
+      allow read: if signedInAs(uid);
+      // The profile and the one protected device must be created atomically.
+      // Once created, the protected device id cannot be changed from a client.
+      allow create: if signedInAs(uid)
+        && request.resource.data.keys().hasOnly(['protectedDeviceId', 'protectedDeviceName', 'createdAt'])
+        && request.resource.data.protectedDeviceId is string
+        && getAfter(/databases/$(database)/documents/users/$(uid)/devices/$(request.resource.data.protectedDeviceId)).data.deviceId == request.resource.data.protectedDeviceId;
+      allow update, delete: if false;
+
+      match /devices/{deviceId} {
+        function isProtectedDevice() {
+          return signedInAs(uid)
+            && exists(/databases/$(database)/documents/users/$(uid))
+            && get(/databases/$(database)/documents/users/$(uid)).data.protectedDeviceId == deviceId;
+        }
+        allow read: if signedInAs(uid);
+        allow create: if signedInAs(uid)
+          && getAfter(/databases/$(database)/documents/users/$(uid)).data.protectedDeviceId == deviceId
+          && request.resource.data.deviceId == deviceId;
+        allow update: if isProtectedDevice();
+        allow delete: if false;
+      }
+
+      match /commands/{commandId} {
+        allow read: if signedInAs(uid);
+        allow create: if signedInAs(uid)
+          && request.resource.data.keys().hasOnly(['deviceId', 'action', 'status', 'createdAt'])
+          && request.resource.data.deviceId is string
+          && get(/databases/$(database)/documents/users/$(uid)).data.protectedDeviceId == request.resource.data.deviceId
+          && exists(/databases/$(database)/documents/users/$(uid)/devices/$(request.resource.data.deviceId))
+          && request.resource.data.action in ['LOCK', 'ALARM', 'STOP_ALARM', 'START_LOST_MODE', 'STOP_LOST_MODE']
+          && request.resource.data.status == 'queued';
+        allow delete: if false;
+        allow update: if signedInAs(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'completedAt']);
+      }
+    }
+  }
+}

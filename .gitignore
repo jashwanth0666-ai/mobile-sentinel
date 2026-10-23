@@ -1,0 +1,12 @@
+.gradle/
+.idea/
+local.properties
+**/build/
+google-services.json
+.firebase/
+functions/node_modules/
+wrapper-bootstrap/
+firebase-debug.log
+
+.release-signing.properties
+release/

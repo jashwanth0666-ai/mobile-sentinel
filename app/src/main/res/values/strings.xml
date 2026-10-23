@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Mobile Sentinel</string>
+    <string name="admin_description">Allows Mobile Sentinel to lock this phone when you request it from your verified account.</string>
+</resources>
