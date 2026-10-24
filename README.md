@@ -3,7 +3,6 @@
 Mobile Sentinel is a personal Android anti-theft companion. It lets you enroll one original phone as the protected device, then sign in on a spare phone in controller mode to view the protected phone's last reported location and queue supported security actions.
 
 **Developer:** [B Jashwanth Sai](https://github.com/jashwanth0666-ai)  
-**Profile:** AI ? Apps ? Automation | Python ? Java ? ML  
 **Website:** [jashwanthonline.netlify.app](https://jashwanthonline.netlify.app/)  
 **Instagram:** [@jashwanth1_17](https://www.instagram.com/jashwanth1_17)  
 **LinkedIn:** [Jashwanth Sai](https://www.linkedin.com/in/jashwanth-sai-57601a300)  
